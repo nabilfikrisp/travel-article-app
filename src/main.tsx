@@ -1,19 +1,21 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
 import { BrowserRouter, Route, Routes } from "react-router";
-import TestingPage from "./app/testing/page.tsx";
-import MainPage from "./app/index/page.tsx";
-import TestingDetailpage from "./app/testing/detail/page.tsx";
+import MainPage from "@/app/index/page.tsx";
+import "./index.css";
+import ArticlesPage from "./app/articles/page";
+import { store } from "./store/store";
+import { Provider } from "react-redux";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/testing" element={<TestingPage />} />
-        <Route path="/testing/:testingId" element={<TestingDetailpage />} />
-      </Routes>
-    </BrowserRouter>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/articles" element={<ArticlesPage />} />
+        </Routes>
+      </BrowserRouter>
+    </Provider>
   </StrictMode>
 );
