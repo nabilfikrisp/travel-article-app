@@ -1,4 +1,4 @@
-import { Article } from "@/store/slices/types";
+import { Article } from "@/store/slices/article/types";
 import ArticleCard from "./article-card";
 import ArticleListPagination from "./article-list-pagination";
 

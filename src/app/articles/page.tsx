@@ -1,10 +1,9 @@
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchArticles } from "@/store/slices/articleSlice";
+import { fetchArticles } from "@/store/slices/article/articleSlice";
 import { useEffect } from "react";
 import ArticleList from "./components/article-list";
 import EmptyArticles from "./components/empty";
 import ArticleLoading from "./components/article-loading";
-import ArticleListPagination from "./components/article-list-pagination";
 import { useSearchParams } from "react-router";
 
 export default function ArticlesPage() {

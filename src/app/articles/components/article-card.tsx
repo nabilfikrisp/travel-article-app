@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatISODate } from "@/lib/format-iso-date";
-import { Article } from "@/store/slices/types";
+import { Article } from "@/store/slices/article/types";
 import { ArrowRightIcon, ClockIcon, MessageCircleIcon } from "lucide-react";
 
 type ArticleCardProps = {

@@ -8,17 +8,13 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fetchArticles } from "@/store/slices/articleSlice";
+import { fetchArticles } from "@/store/slices/article/articleSlice";
 import { useSearchParams } from "react-router";
 
 export default function ArticleListPagination() {
   const dispatch = useAppDispatch();
   const { meta } = useAppSelector((state) => state.article);
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const initialPageSizeParams = searchParams.get("pageSize")
-    ? Number(searchParams.get("pageSize"))
-    : undefined;
 
   if (!meta) return null;
 
@@ -28,7 +24,8 @@ export default function ArticleListPagination() {
       newParams.set("page", page.toString());
       return newParams;
     });
-    dispatch(fetchArticles({ page, pageSize: initialPageSizeParams }));
+    const params = Object.fromEntries(searchParams.entries());
+    dispatch(fetchArticles({ ...params, page }));
   };
 
   const renderPreviousPages = () => {
