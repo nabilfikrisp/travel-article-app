@@ -1,5 +1,6 @@
 import { Article } from "@/store/slices/types";
 import ArticleCard from "./article-card";
+import ArticleListPagination from "./article-list-pagination";
 
 type ArticleListProps = {
   data: Article[];
@@ -13,6 +14,7 @@ export default function ArticleList({ data }: ArticleListProps) {
           <ArticleCard key={article.id} datum={article} />
         ))}
       </ul>
+      <ArticleListPagination />
     </div>
   );
 }

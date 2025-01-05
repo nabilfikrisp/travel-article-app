@@ -5,26 +5,30 @@ import ArticleList from "./components/article-list";
 import EmptyArticles from "./components/empty";
 import ArticleLoading from "./components/article-loading";
 import ArticleListPagination from "./components/article-list-pagination";
+import { useSearchParams } from "react-router";
 
 export default function ArticlesPage() {
   const dispatch = useAppDispatch();
   const { data, error, status } = useAppSelector((state) => state.article);
+  const [searchParams] = useSearchParams();
+
+  const initialPageParams = searchParams.get("page") ? Number(searchParams.get("page")) : 1;
+  const initialPageSizeParams = searchParams.get("pageSize")
+    ? Number(searchParams.get("pageSize"))
+    : undefined;
 
   useEffect(() => {
     if (status === "idle") {
-      dispatch(fetchArticles());
+      dispatch(fetchArticles({ page: initialPageParams, pageSize: initialPageSizeParams }));
     }
-  }, [dispatch, status]);
+  }, [dispatch, status, initialPageParams, initialPageSizeParams]);
 
   if (status === "loading") return <ArticleLoading />;
   if (status === "failed") return <div>Error: {error} ini</div>;
 
   return (
     <div className="py-10">
-      <div className="mb-5 flex flex-col sm:items-center justify-between gap-4 sm:flex-row">
-        <h1 className="text-3xl font-bold">Articles</h1>
-        <ArticleListPagination />
-      </div>
+      <h1 className="mb-5 text-3xl font-bold">Articles</h1>
       {data.length === 0 ? <EmptyArticles /> : <ArticleList data={data} />}
     </div>
   );

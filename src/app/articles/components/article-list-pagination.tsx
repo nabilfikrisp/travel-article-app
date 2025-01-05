@@ -1,6 +1,7 @@
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -8,52 +9,88 @@ import {
 } from "@/components/ui/pagination";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchArticles } from "@/store/slices/articleSlice";
-import { useLocation, useNavigate } from "react-router";
+import { useSearchParams } from "react-router";
 
 export default function ArticleListPagination() {
   const dispatch = useAppDispatch();
   const { meta } = useAppSelector((state) => state.article);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initialPageSizeParams = searchParams.get("pageSize")
+    ? Number(searchParams.get("pageSize"))
+    : undefined;
 
   if (!meta) return null;
 
   const handlePageChange = (page: number) => {
-    navigate({
-      pathname: location.pathname,
-      search: `?page=${page}`,
+    setSearchParams((prevParams) => {
+      const newParams = new URLSearchParams(prevParams);
+      newParams.set("page", page.toString());
+      return newParams;
     });
-    dispatch(fetchArticles({ page }));
+    dispatch(fetchArticles({ page, pageSize: initialPageSizeParams }));
   };
 
-  const renderPageNumbers = () => {
-    const pages = Array.from({ length: meta.pagination.pageCount }).map((_, index) => (
-      <PaginationItem key={index + 1}>
-        <PaginationLink
-          onClick={() => handlePageChange(index + 1)}
-          isActive={index + 1 === meta.pagination.page}
-        >
-          {index + 1}
-        </PaginationLink>
-      </PaginationItem>
-    ));
-    return pages;
+  const renderPreviousPages = () => {
+    const { page } = meta.pagination;
+    if (page <= 1) return null;
+
+    return (
+      <>
+        <PaginationItem>
+          <PaginationPrevious onClick={() => handlePageChange(page - 1)} />
+        </PaginationItem>
+        {page > 2 && (
+          <>
+            <PaginationItem className="hidden sm:flex">
+              <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
+            </PaginationItem>
+            {page > 3 && <PaginationEllipsis className="hidden sm:flex" />}
+          </>
+        )}
+        <PaginationItem>
+          <PaginationLink onClick={() => handlePageChange(page - 1)}>{page - 1}</PaginationLink>
+        </PaginationItem>
+      </>
+    );
+  };
+
+  const renderNextPages = () => {
+    const { page, pageCount } = meta.pagination;
+    if (page >= pageCount) return null;
+
+    return (
+      <>
+        <PaginationItem>
+          <PaginationLink onClick={() => handlePageChange(page + 1)}>{page + 1}</PaginationLink>
+        </PaginationItem>
+        {page < pageCount - 1 && (
+          <>
+            {page < pageCount - 2 && <PaginationEllipsis className="hidden sm:flex" />}
+            <PaginationItem className="hidden sm:flex">
+              <PaginationLink onClick={() => handlePageChange(pageCount)}>
+                {pageCount}
+              </PaginationLink>
+            </PaginationItem>
+          </>
+        )}
+        <PaginationItem>
+          <PaginationNext onClick={() => handlePageChange(page + 1)} />
+        </PaginationItem>
+      </>
+    );
   };
 
   return (
-    <Pagination className="m-0 w-fit">
+    <Pagination>
       <PaginationContent>
-        {meta.pagination.page !== 1 && (
-          <PaginationItem>
-            <PaginationPrevious onClick={() => handlePageChange(meta.pagination.page - 1)} />
-          </PaginationItem>
-        )}
-        {renderPageNumbers()}
-        {meta.pagination.pageCount !== meta.pagination.page && (
-          <PaginationItem>
-            <PaginationNext onClick={() => handlePageChange(meta.pagination.page + 1)} />
-          </PaginationItem>
-        )}
+        {renderPreviousPages()}
+        <PaginationItem>
+          <PaginationLink onClick={() => handlePageChange(meta.pagination.page)} isActive>
+            {meta.pagination.page}
+          </PaginationLink>
+        </PaginationItem>
+        {renderNextPages()}
       </PaginationContent>
     </Pagination>
   );

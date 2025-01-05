@@ -1,16 +1,20 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSearchParams } from "react-router";
 
 export default function ArticleLoading() {
+  const [searchParams] = useSearchParams();
+
+  const initialPageSizeParams = searchParams.get("pageSize")
+    ? Number(searchParams.get("pageSize"))
+    : 6;
+
   return (
     <div className="py-10">
-      <div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <h1 className="text-3xl font-bold">Articles</h1>
-        <Skeleton className="h-10 w-52" />
-      </div>
+      <h1 className="mb-5 text-3xl font-bold">Articles</h1>
       <div>
         <ul className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: initialPageSizeParams }).map((_, index) => (
             <Card
               key={index}
               className="group flex h-[450px] flex-col overflow-hidden transition-all duration-300 hover:shadow-lg"
@@ -23,12 +27,12 @@ export default function ArticleLoading() {
                 <h2 className="mb-3 line-clamp-2 text-xl font-bold leading-tight group-hover:text-primary">
                   <Skeleton className="text-transparent">Kebumen</Skeleton>
                 </h2>
-                <p className="line-clamp-3 text-muted-foreground">
-                  <Skeleton className="text-transparent">
-                    Ini Di Daerah Kebumen Pada Saat Pagi Hari Di Saat Orang-orang sudah mulai
-                    melakukan pekerjaan
-                  </Skeleton>
-                </p>
+
+                <Skeleton className="line-clamp-3 text-transparent">
+                  Ini Di Daerah Kebumen Pada Saat Pagi Hari Di Saat Orang-orang sudah mulai
+                  melakukan pekerjaan
+                </Skeleton>
+
                 <div className="mt-auto pt-4">
                   <span className="inline-flex items-center text-sm font-medium text-primary group-hover:text-primary">
                     <Skeleton className="text-transparent">Read More</Skeleton>
@@ -46,6 +50,7 @@ export default function ArticleLoading() {
             </Card>
           ))}
         </ul>
+        <Skeleton className="mx-auto h-10 w-52" />
       </div>
     </div>
   );
