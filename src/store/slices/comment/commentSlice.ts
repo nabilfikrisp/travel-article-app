@@ -105,9 +105,9 @@ const commentSlice = createSlice({
         state.articleComments[articleDocumentId].error = null;
       })
       .addCase(fetchDetailedComments.fulfilled, (state, action) => {
-        const { articleDocumentId, data } = action.payload;
+        const { articleDocumentId, data, isLoadMore } = action.payload;
         state.articleComments[articleDocumentId] = {
-          data,
+          data: isLoadMore ? [...state.articleComments[articleDocumentId].data, ...data] : data,
           status: "succeeded",
           error: null,
         };
