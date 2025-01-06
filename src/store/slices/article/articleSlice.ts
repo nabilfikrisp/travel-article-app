@@ -7,13 +7,16 @@ import { Pagination } from "@/types/pagination.type";
 
 const initialState: ArticleState = {
   articles: {
-    data: [],
+    data: {
+      home: [],
+      more: [],
+    },
     status: "idle",
     error: null,
     meta: undefined,
   },
   detail: {
-    datum: null,
+    datum: {},
     status: "idle",
     error: null,
   },
@@ -90,7 +93,10 @@ const articleSlice = createSlice({
       })
       .addCase(fetchArticles.fulfilled, (state, action) => {
         state.articles.status = "succeeded";
-        state.articles.data = action.payload.data;
+        if (state.articles.data.home.length === 0) {
+          state.articles.data.home = action.payload.data;
+        }
+        state.articles.data.more = action.payload.data;
         state.articles.meta = action.payload.meta;
       })
       .addCase(fetchArticles.rejected, (state, action) => {
@@ -101,16 +107,20 @@ const articleSlice = createSlice({
     // FETCH BY ID
     builder
       .addCase(fetchArticleByDocumentId.pending, (state) => {
-        state.detail.status = "loading";
         state.detail.error = null;
+        state.detail.status = "loading";
       })
       .addCase(fetchArticleByDocumentId.fulfilled, (state, action) => {
+        const documentId = action.meta.arg;
+        if (!state.detail.datum[documentId]) {
+          state.detail.datum[documentId] = action.payload.data;
+        }
+        // state.detail.datum = action.payload.data;
         state.detail.status = "succeeded";
-        state.detail.datum = action.payload.data;
       })
       .addCase(fetchArticleByDocumentId.rejected, (state, action) => {
-        state.detail.status = "failed";
         state.detail.error = action.payload as string;
+        state.detail.status = "failed";
       });
   },
 });

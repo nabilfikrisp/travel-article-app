@@ -14,8 +14,10 @@ export default function ArticleSection({ className, ...props }: ArticleSection) 
   const { data, error, status } = useAppSelector((state) => state.article.articles);
 
   useEffect(() => {
+    if (data.home.length !== 0) return;
+
     dispatch(fetchArticles({ pageSize: 6 }));
-  }, [dispatch]);
+  }, [dispatch, data]);
 
   if (status === "loading") return <ArticleSectionLoading />;
   if (status === "failed") return <div>Error: {error}</div>;
@@ -30,7 +32,7 @@ export default function ArticleSection({ className, ...props }: ArticleSection) 
         </Link>
       </div>
       <ul className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {data.map((article) => (
+        {data.home.map((article) => (
           <ArticleCard key={article.id} datum={article} />
         ))}
       </ul>

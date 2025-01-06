@@ -5,6 +5,7 @@ import categoryReducer from "./slices/category/categorySlice";
 import commentReducer from "./slices/comment/commentSlice";
 
 export const store = configureStore({
+  devTools: true,
   reducer: {
     article: articleReducer,
     auth: authReducer,

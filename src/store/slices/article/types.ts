@@ -20,13 +20,16 @@ export type Article = {
 
 export type ArticleState = {
   articles: {
-    data: Article[];
+    data: {
+      home: Article[];
+      more: Article[];
+    };
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null | undefined;
     meta: { pagination: Pagination } | undefined;
   };
   detail: {
-    datum: Article | null;
+    datum: Record<string, Article>;
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null | undefined;
   };

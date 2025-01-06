@@ -13,8 +13,10 @@ export default function PopularCategories({ className, ...props }: PopularCatego
   const { data, status, error } = useAppSelector((state) => state.category.categories);
 
   useEffect(() => {
+    if (data.length !== 0) return;
+
     dispatch(fetchCategories());
-  }, [dispatch]);
+  }, [dispatch, data]);
 
   if (status === "loading") return <CategoryLoading className={className} {...props} />;
   if (status === "failed") return <div>Error: {error}</div>;

@@ -35,7 +35,7 @@ export default function ArticlesPage() {
         <h1 className="text-3xl font-bold">Articles</h1>
         {params.category && <ArticleCategoryBadge category={params.category} />}
       </div>
-      {data.length === 0 ? <EmptyArticles /> : <ArticleList data={data} />}
+      {data.more.length === 0 ? <EmptyArticles /> : <ArticleList data={data.more} />}
     </div>
   );
 }

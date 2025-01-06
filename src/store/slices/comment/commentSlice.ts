@@ -48,27 +48,28 @@ export const fetchDetailedComments = createAsyncThunk(
     }: { arrayOfDocumentIds: string[]; articleDocumentId: string; isLoadMore?: boolean },
     { rejectWithValue }
   ) => {
+    console.log(articleDocumentId, "from action");
     try {
-      const responses = await Promise.all(
-        arrayOfDocumentIds.map(async (documentId) => {
-          const response = await apiClient.get<ApiResponse<CommentDetail>>(
-            `/comments/${documentId}`,
-            {
-              params: {
-                populate: "*",
-              },
-            }
-          );
+        const responses = await Promise.all(
+          arrayOfDocumentIds.map(async (documentId) => {
+            const response = await apiClient.get<ApiResponse<CommentDetail>>(
+              `/comments/${documentId}`,
+              {
+                params: {
+                  populate: "*",
+                },
+              }
+            );
 
-          return response.data;
-        })
-      );
+            return response.data;
+          })
+        );
 
-      return {
-        data: responses.map((response) => response.data),
-        articleDocumentId,
-        isLoadMore,
-      };
+        return {
+          data: responses.map((response) => response.data),
+          articleDocumentId,
+          isLoadMore,
+        };
     } catch (error: unknown) {
       return rejectWithValue(error || "Error fetching comments");
     }
