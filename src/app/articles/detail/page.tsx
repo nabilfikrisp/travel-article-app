@@ -17,18 +17,9 @@ export function ArticleDetailPage() {
     dispatch(fetchArticleByDocumentId(documentId));
   }, [dispatch, documentId, datum]);
 
-  if (status === "loading")
-    return (
-      <div className="py-10">
-        <ArticleDetailLoading />;
-      </div>
-    );
+  if (status === "loading") return <ArticleDetailLoading />;
   if (status === "failed") return <div>Error: {error}</div>;
   if (!documentId) return <Navigate to="/articles" />;
 
-  return (
-    <div className="py-10">
-      <ArticleDetail documentId={documentId} />
-    </div>
-  );
+  return <ArticleDetail documentId={documentId} />;
 }

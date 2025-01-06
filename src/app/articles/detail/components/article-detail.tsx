@@ -15,7 +15,7 @@ export default function ArticleDetail({ documentId }: ArticleDetailProps) {
   if (!datum) return <div>Article Not Found</div>;
 
   return (
-    <>
+    <div className="py-10">
       <h1 className="mb-5 text-3xl font-bold">{datum.title}</h1>
       {datum.cover_image_url ? (
         <img
@@ -54,15 +54,14 @@ export default function ArticleDetail({ documentId }: ArticleDetailProps) {
       <h2 className="mb-5 text-2xl font-bold">Comments</h2>
       {datum.comments && datum.comments?.length > 0 ? (
         <>
-          <div>TOTAL COMMENT{datum.comments.length}</div>
           <ArticleComments
             documentIds={datum.comments.map((comment) => comment.documentId)}
             articleDocumentId={documentId}
           />
         </>
       ) : (
-        <>no comment</>
+        <div>No comment :(</div>
       )}
-    </>
+    </div>
   );
 }

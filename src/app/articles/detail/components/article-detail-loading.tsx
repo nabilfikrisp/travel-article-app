@@ -4,7 +4,7 @@ import ArticleCommentLoading from "./article-comment-loading";
 
 export default function ArticleDetailLoading() {
   return (
-    <>
+    <div className="py-10">
       <Skeleton className="mb-5 text-3xl font-bold text-transparent">kebumen</Skeleton>
 
       <Skeleton className="mb-5 aspect-video max-h-[500px] w-full rounded-lg text-transparent" />
@@ -22,6 +22,6 @@ export default function ArticleDetailLoading() {
       <Separator className="my-5 bg-primary" />
       <Skeleton className="mb-5 text-2xl font-bold text-transparent">Comments</Skeleton>
       <ArticleCommentLoading />
-    </>
+    </div>
   );
 }

@@ -50,26 +50,26 @@ export const fetchDetailedComments = createAsyncThunk(
   ) => {
     console.log(articleDocumentId, "from action");
     try {
-        const responses = await Promise.all(
-          arrayOfDocumentIds.map(async (documentId) => {
-            const response = await apiClient.get<ApiResponse<CommentDetail>>(
-              `/comments/${documentId}`,
-              {
-                params: {
-                  populate: "*",
-                },
-              }
-            );
+      const responses = await Promise.all(
+        arrayOfDocumentIds.map(async (documentId) => {
+          const response = await apiClient.get<ApiResponse<CommentDetail>>(
+            `/comments/${documentId}`,
+            {
+              params: {
+                populate: "*",
+              },
+            }
+          );
 
-            return response.data;
-          })
-        );
+          return response.data;
+        })
+      );
 
-        return {
-          data: responses.map((response) => response.data),
-          articleDocumentId,
-          isLoadMore,
-        };
+      return {
+        data: responses.map((response) => response.data),
+        articleDocumentId,
+        isLoadMore,
+      };
     } catch (error: unknown) {
       return rejectWithValue(error || "Error fetching comments");
     }
@@ -106,9 +106,9 @@ const commentSlice = createSlice({
         state.articleComments[articleDocumentId].error = null;
       })
       .addCase(fetchDetailedComments.fulfilled, (state, action) => {
-        const { articleDocumentId, data } = action.payload;
+        const { articleDocumentId, data, isLoadMore } = action.payload;
         state.articleComments[articleDocumentId] = {
-          data,
+          data: isLoadMore ? [...state.articleComments[articleDocumentId].data, ...data] : data,
           status: "succeeded",
           error: null,
         };
