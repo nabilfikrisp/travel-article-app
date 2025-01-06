@@ -37,6 +37,7 @@ export type ArticleState = {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null | undefined;
   };
+  uploadedImgURL: string | null | undefined;
 };
 
 export const ArticleQueryParams = {
@@ -44,3 +45,10 @@ export const ArticleQueryParams = {
   PAGE_SIZE: "pagination[pageSize]",
   CATEGORY: "filters[category][name][$eqi]",
 } as const;
+
+export type MutatePostArticleDto = {
+  title: string;
+  description: string;
+  cover_image_url?: string | undefined;
+  category?: number | undefined;
+};

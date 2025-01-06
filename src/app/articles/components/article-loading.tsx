@@ -10,8 +10,7 @@ export default function ArticleLoading() {
     : 6;
 
   return (
-    <div className="py-10">
-      <h1 className="mb-5 text-3xl font-bold">Articles</h1>
+
       <div>
         <ul className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: initialPageSizeParams }).map((_, index) => (
@@ -52,6 +51,6 @@ export default function ArticleLoading() {
         </ul>
         <Skeleton className="mx-auto h-10 w-52" />
       </div>
-    </div>
+
   );
 }

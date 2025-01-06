@@ -48,7 +48,6 @@ export const fetchDetailedComments = createAsyncThunk(
     }: { arrayOfDocumentIds: string[]; articleDocumentId: string; isLoadMore?: boolean },
     { rejectWithValue }
   ) => {
-    console.log(articleDocumentId, "from action");
     try {
       const responses = await Promise.all(
         arrayOfDocumentIds.map(async (documentId) => {
@@ -106,9 +105,9 @@ const commentSlice = createSlice({
         state.articleComments[articleDocumentId].error = null;
       })
       .addCase(fetchDetailedComments.fulfilled, (state, action) => {
-        const { articleDocumentId, data, isLoadMore } = action.payload;
+        const { articleDocumentId, data } = action.payload;
         state.articleComments[articleDocumentId] = {
-          data: isLoadMore ? [...state.articleComments[articleDocumentId].data, ...data] : data,
+          data,
           status: "succeeded",
           error: null,
         };
