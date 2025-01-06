@@ -55,7 +55,7 @@ export default function ArticleDetail({ documentId }: ArticleDetailProps) {
       {datum.comments && datum.comments?.length > 0 ? (
         <>
           <ArticleComments
-            documentIds={datum.comments.map((comment) => comment.documentId)}
+            commentDocumentIds={datum.comments.map((comment) => comment.documentId)}
             articleDocumentId={documentId}
           />
         </>

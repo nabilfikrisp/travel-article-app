@@ -6,11 +6,14 @@ import ArticleCommentLoading from "./article-comment-loading";
 import { formatISODate } from "@/lib/format-iso-date";
 
 type ArticleCommentsType = {
-  documentIds: string[];
+  commentDocumentIds: string[];
   articleDocumentId: string;
 };
 
-export default function ArticleComments({ articleDocumentId, documentIds }: ArticleCommentsType) {
+export default function ArticleComments({
+  articleDocumentId,
+  commentDocumentIds,
+}: ArticleCommentsType) {
   const dispatch = useAppDispatch();
   const articleComments = useAppSelector(
     (state) => state.comment.articleComments[articleDocumentId]
@@ -19,23 +22,23 @@ export default function ArticleComments({ articleDocumentId, documentIds }: Arti
   const limit = 5;
 
   useEffect(() => {
-    if (offset !== 0 || articleComments) return;
+    if (articleComments) {
+      setOffset(articleComments.data.length);
+      return;
+    }
 
     dispatch(
       fetchDetailedComments({
-        arrayOfDocumentIds: documentIds.slice(0, limit),
+        arrayOfDocumentIds: commentDocumentIds.slice(0, limit),
         articleDocumentId,
       })
     );
-  }, [dispatch, articleDocumentId, documentIds, offset, articleComments]);
+  }, [dispatch, articleDocumentId, commentDocumentIds, articleComments]);
 
   const handleLoadMore = () => {
-    const newOffset = offset + limit;
-    setOffset(newOffset);
-
     dispatch(
       fetchDetailedComments({
-        arrayOfDocumentIds: documentIds.slice(newOffset, newOffset + limit),
+        arrayOfDocumentIds: commentDocumentIds.slice(offset, offset + limit),
         articleDocumentId,
         isLoadMore: true,
       })
@@ -46,7 +49,7 @@ export default function ArticleComments({ articleDocumentId, documentIds }: Arti
   if (articleComments.status === "loading" && offset === 0) return <ArticleCommentLoading />;
   if (articleComments.status === "failed") return <p>Error: {articleComments.error}</p>;
 
-  const renderButtonCondition = articleComments.data.length !== documentIds.length;
+  const renderButtonCondition = articleComments.data.length !== commentDocumentIds.length;
 
   return (
     <>
