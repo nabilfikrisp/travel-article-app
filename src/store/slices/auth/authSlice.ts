@@ -76,6 +76,7 @@ const authSlice = createSlice({
       state.status = "idle";
       state.error = null;
       Cookies.remove("credentials");
+      window.location.reload();
     },
   },
   extraReducers: (builder) => {

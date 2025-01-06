@@ -14,6 +14,7 @@ import { Toaster } from "./components/ui/toaster.tsx";
 import AuthGuard from "./app/route-guards/auth-guard.tsx";
 import GuestGuard from "./app/route-guards/guest-guard.tsx";
 import { ThemeProvider } from "./components/theme-provider.tsx";
+import { ArticleDetailPage } from "./app/articles/detail/page.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -23,7 +24,12 @@ createRoot(document.getElementById("root")!).render(
           <Routes>
             <Route element={<RootLayout />}>
               <Route index element={<MainPage />} />
-              <Route path="articles" element={<ArticlesPage />} />
+              <Route path="articles">
+                <Route index element={<ArticlesPage />} />
+                <Route element={<AuthGuard />}>
+                  <Route path=":documentId" element={<ArticleDetailPage />} />
+                </Route>
+              </Route>
 
               <Route element={<AuthGuard />}>
                 <Route path="dashboard" element={<>dashboard</>} />

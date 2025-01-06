@@ -13,7 +13,7 @@ import { useSearchParams } from "react-router";
 
 export default function ArticleListPagination() {
   const dispatch = useAppDispatch();
-  const { meta } = useAppSelector((state) => state.article);
+  const { meta } = useAppSelector((state) => state.article.articles);
   const [searchParams, setSearchParams] = useSearchParams();
 
   if (!meta) return null;

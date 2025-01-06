@@ -1,18 +1,22 @@
+import { AuthResponse } from "@/store/slices/auth/types";
 import axios from "axios";
 import Cookies from "js-cookie";
 
-// Create an Axios instance
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_PUBLIC_BE_URL,
 });
 
-// Add a request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    const token = Cookies.get("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const credentialsCookie = Cookies.get("credentials");
+    const credentialsObject = credentialsCookie
+      ? (JSON.parse(credentialsCookie) as AuthResponse)
+      : null;
+
+    if (credentialsObject) {
+      config.headers.Authorization = `Bearer ${credentialsObject.jwt}`;
     }
+
     return config;
   },
   (error) => {
@@ -20,7 +24,6 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Add a response interceptor
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

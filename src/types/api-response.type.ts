@@ -1,8 +1,4 @@
-import { Pagination } from "./pagination.type";
-
-export type ApiResponse<T> = {
+export type ApiResponse<T, Meta = undefined> = {
   data: T;
-  meta: {
-    pagination: Pagination;
-  };
+  meta: Meta;
 };

@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatISODate } from "@/lib/format-iso-date";
 import { Article } from "@/store/slices/article/types";
 import { ArrowRightIcon, ClockIcon, MessageCircleIcon } from "lucide-react";
+import { Link } from "react-router";
 
 type ArticleCardProps = {
   datum: Article;
@@ -17,6 +18,7 @@ export default function ArticleCard({ datum }: ArticleCardProps) {
           <img
             src={datum.cover_image_url}
             alt={datum.title}
+            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
@@ -41,12 +43,12 @@ export default function ArticleCard({ datum }: ArticleCardProps) {
           {datum.title}
         </h2>
         <p className="line-clamp-3 text-muted-foreground">{datum.description}</p>
-        <div className="mt-auto pt-4">
+        <Link to={`/articles/${datum.documentId}`} className="mt-auto pt-4 hover:cursor-pointer">
           <span className="inline-flex items-center text-sm font-medium text-primary group-hover:text-primary">
             Read more
             <ArrowRightIcon className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </span>
-        </div>
+        </Link>
       </CardContent>
 
       <CardFooter className="border-t bg-muted py-3">

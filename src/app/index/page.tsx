@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import ArticleCarousel from "./components/article-section";
+import PopularCategories from "./components/popular-categories";
 
 export default function MainPage() {
   return (
-    <div>
-      <h1 className={cn("mt-0 text-sm font-bold")}>INI PAGE UTAMA</h1>
-      <Button>hallo</Button>
+    <div className="py-10">
+      <PopularCategories className="mb-10" />
+      <ArticleCarousel />
     </div>
   );
 }
