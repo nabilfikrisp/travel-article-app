@@ -72,7 +72,8 @@ export const fetchGetMe = createAsyncThunk("auth/fetchGetMe", async (_, { reject
     const response = await apiClient.get<User>("/users/me", {
       params: {
         "populate[articles][populate][user]": "*",
-        "populate[comments]": "*",
+        "populate[articles][populate][comments]": "*",
+        "populate[comments][populate][article]": "*",
       },
     });
     return response.data;

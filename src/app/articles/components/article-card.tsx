@@ -8,9 +8,10 @@ import { Link } from "react-router";
 
 type ArticleCardProps = {
   datum: Article;
+  withComments?: boolean;
 };
 
-export default function ArticleCard({ datum }: ArticleCardProps) {
+export default function ArticleCard({ datum, withComments = true }: ArticleCardProps) {
   return (
     <Card className="group flex h-[450px] flex-col overflow-hidden transition-all duration-300 hover:shadow-lg">
       <div className="relative h-[200px] overflow-hidden">
@@ -57,12 +58,14 @@ export default function ArticleCard({ datum }: ArticleCardProps) {
         </Link>
       </CardContent>
 
-      <CardFooter className="border-t bg-muted py-3">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <MessageCircleIcon className="h-4 w-4" />
-          <span className="text-sm">{datum.comments?.length || 0} Comments</span>
-        </div>
-      </CardFooter>
+      {withComments && (
+        <CardFooter className="border-t bg-muted py-3">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <MessageCircleIcon className="h-4 w-4" />
+            <span className="text-sm">{datum.comments?.length || 0} Comments</span>
+          </div>
+        </CardFooter>
+      )}
     </Card>
   );
 }

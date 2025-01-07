@@ -1,46 +1,47 @@
-import { useEffect } from "react";
-import MyArticles from "./components/my-articles";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAppDispatch } from "@/store/hooks";
 import { fetchGetMe } from "@/store/slices/auth/authSlice";
-import { Link, Navigate } from "react-router";
-import MyArticlesLoading from "./components/my-articles-loading";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import MyArticles from "./components/my-article";
+import MyComents from "./components/my-comments";
+import ArticleChartDataFetcher from "./components/article-chart-data-fethcer";
+import { useSearchParams } from "react-router";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
-  const { user, status, error } = useAppSelector((state) => state.auth);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     dispatch(fetchGetMe());
   }, [dispatch]);
 
-  function renderHeader() {
-    return (
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-5">
-        <div className="flex items-center gap-4">
-          <h1 className="text-3xl font-bold">Articles</h1>
-        </div>
-        <Button asChild>
-          <Link to="/articles/create">Create Your Own Article!</Link>
-        </Button>
-      </div>
-    );
-  }
+  const currentTab = searchParams.get("tab") || "articles";
 
-  function renderContent() {
-    if (!user) return <Navigate to="/login" />;
-    if (!user.articles) return <MyArticlesLoading />;
-    if (status === "loading") return <MyArticlesLoading />;
-    if (status === "failed") return <div>Error: {error}</div>;
-    return (
-      <MyArticles articles={user.articles.filter((article) => article.publishedAt !== null)} />
-    );
-  }
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value });
+  };
 
   return (
-    <div className="py-10">
-      {renderHeader()}
-      {renderContent()}
-    </div>
+    <Tabs
+      defaultValue={currentTab}
+      value={currentTab}
+      onValueChange={(value) => handleTabChange(value)}
+      className="py-10"
+    >
+      <TabsList>
+        <TabsTrigger value="articles">My Articles</TabsTrigger>
+        <TabsTrigger value="comments">My Comments</TabsTrigger>
+        <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+      </TabsList>
+      <TabsContent value="articles">
+        <MyArticles />
+      </TabsContent>
+      <TabsContent value="comments">
+        <MyComents />
+      </TabsContent>
+      <TabsContent value="dashboard">
+        <ArticleChartDataFetcher />
+      </TabsContent>
+    </Tabs>
   );
 }
