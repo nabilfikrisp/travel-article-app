@@ -37,4 +37,8 @@ export type CommentState = {
       error: string | null;
     };
   };
+  mutation: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null | undefined;
+  };
 };

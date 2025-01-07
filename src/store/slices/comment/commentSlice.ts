@@ -17,6 +17,10 @@ const initialState: CommentState = {
     error: null,
   },
   articleComments: {},
+  mutation: {
+    status: "idle",
+    error: null,
+  },
 };
 
 export const fetchCommentByDocumentId = createAsyncThunk(
@@ -75,6 +79,39 @@ export const fetchDetailedComments = createAsyncThunk(
   }
 );
 
+export const mutatePostComment = createAsyncThunk(
+  "comments/mutatePostComment",
+  async (
+    {
+      content,
+      article,
+      articleDocumentId,
+    }: { content: string; article: number; articleDocumentId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await apiClient.post<ApiResponse<CommentDetail>>(
+        `/comments`,
+        { data: { content, article } },
+        {
+          params: {
+            populate: "*",
+          },
+        }
+      );
+      return {
+        response: response.data,
+        articleDocumentId,
+      };
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response ? error.response.data.error.message : error.message);
+      }
+      return rejectWithValue("An unexpected error occurred");
+    }
+  }
+);
+
 const commentSlice = createSlice({
   name: "comments",
   initialState,
@@ -116,6 +153,22 @@ const commentSlice = createSlice({
         const { articleDocumentId } = action.meta.arg;
         state.articleComments[articleDocumentId].status = "failed";
         state.articleComments[articleDocumentId].error = action.payload as string;
+      })
+      // MUTATE POST COMMENT
+      .addCase(mutatePostComment.pending, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "loading";
+      })
+      .addCase(mutatePostComment.fulfilled, (state, action) => {
+        const { articleDocumentId } = action.payload;
+        if (state.articleComments[articleDocumentId]) {
+          state.articleComments[articleDocumentId].data.unshift(action.payload.response.data);
+        }
+        state.mutation.status = "succeeded";
+      })
+      .addCase(mutatePostComment.rejected, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "failed";
       });
   },
 });

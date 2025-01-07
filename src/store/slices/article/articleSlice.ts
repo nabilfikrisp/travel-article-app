@@ -130,7 +130,14 @@ export const mutatePostImage = createAsyncThunk(
 const articleSlice = createSlice({
   name: "articles",
   initialState,
-  reducers: {},
+  reducers: {
+    pushCommentToArticle(state, action) {
+      const { articleDocumentId, comment } = action.payload;
+      if (state.detail.datum[articleDocumentId]) {
+        state.detail.datum[articleDocumentId].comments?.push(comment);
+      }
+    },
+  },
   extraReducers: (builder) => {
     // FETCH ALL
     builder
@@ -201,5 +208,6 @@ const articleSlice = createSlice({
   },
 });
 
+export const articleSliceAction = articleSlice.actions;
 const articleReducer = articleSlice.reducer;
 export default articleReducer;

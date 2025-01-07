@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatISODate } from "@/lib/format-iso-date";
 import ArticleComments from "./article-comments";
 import { useAppSelector } from "@/store/hooks";
+import ArticleCreateCommentForm from "./article-create-comment-form";
 
 type ArticleDetailProps = {
   documentId: string;
@@ -52,13 +53,15 @@ export default function ArticleDetail({ documentId }: ArticleDetailProps) {
       <p className="mb-5">{datum.description}</p>
       <Separator className="my-5 bg-primary" />
       <h2 className="mb-5 text-2xl font-bold">Comments</h2>
+      <ArticleCreateCommentForm articleDocumentId={documentId} articleId={datum.id} />
       {datum.comments && datum.comments?.length > 0 ? (
-        <>
-          <ArticleComments
-            commentDocumentIds={datum.comments.map((comment) => comment.documentId)}
-            articleDocumentId={documentId}
-          />
-        </>
+        <ArticleComments
+          commentDocumentIds={datum.comments
+            .slice(0)
+            .reverse()
+            .map((comment) => comment.documentId)}
+          articleDocumentId={documentId}
+        />
       ) : (
         <div>No comment :(</div>
       )}

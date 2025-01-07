@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchDetailedComments } from "@/store/slices/comment/commentSlice";
 import { useEffect, useState } from "react";
 import ArticleCommentLoading from "./article-comment-loading";
-import { formatISODate } from "@/lib/format-iso-date";
+import ArticleCommentCard from "./article-comment-card";
 
 type ArticleCommentsType = {
   commentDocumentIds: string[];
@@ -19,7 +19,7 @@ export default function ArticleComments({
     (state) => state.comment.articleComments[articleDocumentId]
   );
   const [offset, setOffset] = useState(0);
-  const limit = 5;
+  const limit = 3;
 
   useEffect(() => {
     if (articleComments) {
@@ -54,14 +54,8 @@ export default function ArticleComments({
   return (
     <>
       <ul className="mb-5 flex flex-col gap-4">
-        {articleComments.data.map((comment, index) => (
-          <div className="overflow-hidden rounded-lg border border-foreground p-4" key={index}>
-            <div className="mb-2 flex items-center gap-2">
-              <span className="font-semibold">{comment.user.username}</span>
-              <span className="text-sm">{formatISODate(comment.publishedAt)}</span>
-            </div>
-            <p>{comment.content}</p>
-          </div>
+        {articleComments.data.map((comment) => (
+          <ArticleCommentCard datum={comment} key={comment.id} />
         ))}
       </ul>
       {renderButtonCondition && (
@@ -69,6 +63,7 @@ export default function ArticleComments({
           onClick={() => handleLoadMore()}
           isLoading={articleComments.status === "loading"}
           className="w-full"
+          variant="secondary"
         >
           Load More
         </Button>

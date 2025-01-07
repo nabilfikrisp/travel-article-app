@@ -21,6 +21,8 @@ export default function ArticleDetailLoading() {
       </Skeleton>
       <Separator className="my-5 bg-primary" />
       <Skeleton className="mb-5 text-2xl font-bold text-transparent">Comments</Skeleton>
+      <Skeleton className="mb-4 h-20" />
+      <Skeleton className="mb-5 h-10" />
       <ArticleCommentLoading />
     </div>
   );
