@@ -1,10 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { formatISODate } from "@/lib/format-iso-date";
-import ArticleComments from "./article-comments";
 import { useAppSelector } from "@/store/hooks";
 import ArticleCreateCommentForm from "./article-create-comment-form";
+import ArticleCommentsV2 from "./article-comments-v2";
+import { Button } from "@/components/ui/button";
+import { FilePenLineIcon } from "lucide-react";
+import { Link } from "react-router";
+import DeleteArticleButton from "./delete-article-button";
 
 type ArticleDetailProps = {
   documentId: string;
@@ -12,6 +15,7 @@ type ArticleDetailProps = {
 
 export default function ArticleDetail({ documentId }: ArticleDetailProps) {
   const datum = useAppSelector((state) => state.article.detail.datum[documentId]);
+  const { user } = useAppSelector((state) => state.auth);
 
   if (!datum) return <div>Article Not Found</div>;
 
@@ -26,7 +30,7 @@ export default function ArticleDetail({ documentId }: ArticleDetailProps) {
           className="mb-5 aspect-video max-h-[500px] w-full rounded-lg object-cover"
         />
       ) : (
-        <Skeleton className="mb-5 aspect-video max-h-[500px] w-full rounded-lg" />
+        <div className="mb-5 aspect-video max-h-[500px] w-full rounded-lg bg-gray-400"></div>
       )}
       <div className="mb-5 flex flex-wrap gap-2">
         <div>
@@ -49,19 +53,24 @@ export default function ArticleDetail({ documentId }: ArticleDetailProps) {
             <span className="ml-1">-</span>
           )}
         </div>
+        {user?.documentId === datum.user?.documentId && (
+          <div className="ml-auto flex items-center gap-2">
+            <Button asChild>
+              <Link to={`/articles/${datum.documentId}/edit`}>
+                Edit
+                <FilePenLineIcon className="ml-1" />
+              </Link>
+            </Button>
+            <DeleteArticleButton articleDocumentId={datum.documentId} />
+          </div>
+        )}
       </div>
       <p className="mb-5">{datum.description}</p>
       <Separator className="my-5 bg-primary" />
       <h2 className="mb-5 text-2xl font-bold">Comments</h2>
       <ArticleCreateCommentForm articleDocumentId={documentId} articleId={datum.id} />
       {datum.comments && datum.comments?.length > 0 ? (
-        <ArticleComments
-          commentDocumentIds={datum.comments
-            .slice(0)
-            .reverse()
-            .map((comment) => comment.documentId)}
-          articleDocumentId={documentId}
-        />
+        <ArticleCommentsV2 articleDocumentId={datum.documentId} comments={datum.comments} />
       ) : (
         <div>No comment :(</div>
       )}

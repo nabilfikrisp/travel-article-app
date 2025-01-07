@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatISODate } from "@/lib/format-iso-date";
 import { Article } from "@/store/slices/article/types";
-import { ArrowRightIcon, ClockIcon, MessageCircleIcon } from "lucide-react";
+import { ArrowRightIcon, ClockIcon, MessageCircleIcon, UserIcon } from "lucide-react";
 import { Link } from "react-router";
 
 type ArticleCardProps = {
@@ -35,9 +35,15 @@ export default function ArticleCard({ datum }: ArticleCardProps) {
       </div>
 
       <CardContent className="flex flex-1 flex-col pt-4">
-        <div className="mb-2 flex items-center">
-          <ClockIcon className="mr-1 h-3 w-3" />
-          <span className="text-xs">{formatISODate(datum.publishedAt)}</span>
+        <div className="mb-2 flex items-center gap-4">
+          <div className="flex items-center text-xs">
+            <UserIcon className="mr-1 h-4 w-4" />
+            <span className="font-bold">{datum.user?.username || "-"}</span>
+          </div>
+          <div className="flex items-center">
+            <ClockIcon className="mr-1 h-3 w-3" />
+            <span className="text-xs">{formatISODate(datum.publishedAt)}</span>
+          </div>
         </div>
         <h2 className="mb-3 line-clamp-2 text-xl font-bold leading-tight group-hover:text-primary">
           {datum.title}

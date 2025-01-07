@@ -21,7 +21,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { mutatePostArticle, mutatePostImage } from "@/store/slices/article/articleSlice";
+import {
+  fetchArticleByDocumentId,
+  mutatePostArticle,
+  mutatePostImage,
+  mutatePutArticle,
+} from "@/store/slices/article/articleSlice";
 import { Category } from "@/store/slices/category/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckIcon, ChevronsUpDown } from "lucide-react";
@@ -75,28 +80,45 @@ const formSchema = z.object({
   // ),
 });
 
-type CreateArticleFormProps = {
+type ArticleFormProps = {
   categories: Category[];
+  initialData?: {
+    title: string;
+    description: string;
+    cover_image_url: string | null | undefined;
+    category: Category | null | undefined;
+    articleDocumentId: string;
+  };
 };
 
-export default function CreateArticleForm({ categories }: CreateArticleFormProps) {
+// INITIAL DATA ONLY USED WHEN EDIT
+export default function ArticleForm({ categories, initialData }: ArticleFormProps) {
   const { toast } = useToast();
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.article.mutation);
   const { status: categoriesStatus } = useAppSelector((state) => state.category.categories);
   const navigate = useNavigate();
-  const [preview, setPreview] = useState<string>("");
+  const [preview, setPreview] = useState<string>(
+    initialData ? initialData.cover_image_url || "" : ""
+  );
 
   const categoriesInput = categories.map((datum) => ({ label: datum.name, value: datum.id }));
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      cover_image_url: "",
-      category: undefined,
-    },
+    defaultValues: initialData
+      ? {
+          title: initialData.title,
+          description: initialData.description,
+          cover_image_url: initialData.cover_image_url || "",
+          category: initialData.category?.id || undefined,
+        }
+      : {
+          title: "",
+          description: "",
+          cover_image_url: "",
+          category: undefined,
+        },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -111,12 +133,27 @@ export default function CreateArticleForm({ categories }: CreateArticleFormProps
         title: values.title,
         description: values.description,
         category: values.category || undefined,
-        cover_image_url: coverImageUrl,
+        cover_image_url: coverImageUrl || values.cover_image_url,
       };
 
-      await dispatch(mutatePostArticle(articlePayload)).unwrap();
-      toast({ description: "Article created successfully!" });
-      navigate("/");
+      if (initialData) {
+        await dispatch(
+          mutatePutArticle({
+            articleDocumentId: initialData.articleDocumentId,
+            dto: articlePayload,
+          })
+        ).unwrap();
+      } else {
+        await dispatch(mutatePostArticle(articlePayload)).unwrap();
+      }
+      toast({ description: initialData ? "Article updated!" : "Article created!" });
+
+      if (initialData) {
+        await dispatch(fetchArticleByDocumentId(initialData.articleDocumentId));
+        navigate(`/articles/${initialData.articleDocumentId}`);
+      } else {
+        navigate("/profile");
+      }
     } catch (error: unknown) {
       console.error(error);
       toast({ description: `Uh Oh! ${String(error)}`, variant: "destructive" });
@@ -248,7 +285,7 @@ export default function CreateArticleForm({ categories }: CreateArticleFormProps
         </div>
 
         <Button type="submit" className="mt-4" isLoading={status === "loading"}>
-          Create Article
+          {initialData ? "Update" : "Create"}
         </Button>
       </form>
     </Form>

@@ -45,6 +45,7 @@ export default function ArticleCreateCommentForm({
         articleSliceAction.pushCommentToArticle({ articleDocumentId, comment: response.data })
       );
       toast({ description: "Comment successfully sent!" });
+      form.reset();
     } catch (error: unknown) {
       toast({ description: `Uh Oh! ${error as string}`, variant: "destructive" });
     }

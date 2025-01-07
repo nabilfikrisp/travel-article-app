@@ -1,3 +1,6 @@
+import { Article } from "../article/types";
+import { Comment } from "../comment/types";
+
 export type AuthResponse = {
   jwt: string;
   user: User;
@@ -26,6 +29,21 @@ export type User = {
   updatedAt: string;
   publishedAt: string;
   locale: null | string;
+  role:
+    | {
+        id: number;
+        documentId: string;
+        name: string;
+        description: string;
+        type: string;
+        createdAt: string;
+        updatedAt: string;
+        publishedAt: string;
+        locale: null;
+      }
+    | undefined;
+  articles: Article[] | undefined;
+  comments: Comment[] | undefined;
 };
 
 export type AuthState = {

@@ -12,6 +12,7 @@ export type Comment = {
   locale: null;
   article?: Article | null | undefined;
   localizations?: [] | undefined;
+  user: User | undefined;
 };
 
 export type CommentDetail = Comment & {

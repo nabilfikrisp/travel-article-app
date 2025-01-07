@@ -45,7 +45,9 @@ export const fetchArticles = createAsyncThunk(
         "/articles",
         {
           params: {
-            populate: "*",
+            "populate[comments][populate][user]": "*",
+            "populate[user]": "*",
+            "populate[category]": "*",
             [ArticleQueryParams.PAGE_SIZE]: pageSize,
             [ArticleQueryParams.PAGE]: page,
             ...(category && { [ArticleQueryParams.CATEGORY]: category }),
@@ -68,7 +70,9 @@ export const fetchArticleByDocumentId = createAsyncThunk(
     try {
       const response = await apiClient.get<ApiResponse<Article>>(`/articles/${documentId}`, {
         params: {
-          populate: "*",
+          "populate[comments][populate][user]": "*",
+          "populate[user]": "*",
+          "populate[category]": "*",
         },
       });
       return response.data;
@@ -92,7 +96,9 @@ export const mutatePostArticle = createAsyncThunk(
         },
         {
           params: {
-            populate: "*",
+            "populate[comments][populate][user]": "*",
+            "populate[user]": "*",
+            "populate[category]": "*",
           },
         }
       );
@@ -116,6 +122,59 @@ export const mutatePostImage = createAsyncThunk(
           url: string;
         }[]
       >("/upload", { files: file }, { headers: { "Content-Type": "multipart/form-data" } });
+
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response ? error.response.data.error.message : error.message);
+      }
+      return rejectWithValue("An unexpected error occurred");
+    }
+  }
+);
+
+export const mutatePutArticle = createAsyncThunk(
+  "articles/mutatePutArticle",
+  async (
+    { articleDocumentId, dto }: { articleDocumentId: string; dto: MutatePostArticleDto },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await apiClient.put<ApiResponse<Article>>(
+        `/articles/${articleDocumentId}`,
+        {
+          data: dto,
+        },
+        {
+          params: {
+            "populate[comments][populate][user]": "*",
+            "populate[user]": "*",
+            "populate[category]": "*",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response ? error.response.data.error.message : error.message);
+      }
+      return rejectWithValue("An unexpected error occurred");
+    }
+  }
+);
+
+export const mutateDeleteArticle = createAsyncThunk(
+  "articles/mutateDeleteArticle",
+  async (articleDocumentId: string, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.delete(`/articles/${articleDocumentId}`, {
+        params: {
+          "populate[comments][populate][user]": "*",
+          "populate[user]": "*",
+          "populate[category]": "*",
+        },
+      });
 
       return response.data;
     } catch (error: unknown) {
@@ -243,6 +302,39 @@ const articleSlice = createSlice({
         state.mutation.status = "succeeded";
       })
       .addCase(mutatePostImage.rejected, (state, action) => {
+        state.mutation.error = action.payload as string;
+        state.mutation.status = "failed";
+      })
+
+      // MUTATE PUT
+      .addCase(mutatePutArticle.pending, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "loading";
+      })
+      .addCase(mutatePutArticle.fulfilled, (state, action) => {
+        if (state.articles.data.home.length > 0) {
+          const index = state.articles.data.home.findIndex(
+            (comment) => comment.id === action.payload.data.id
+          );
+          state.articles.data.home[index] = action.payload.data;
+        }
+        state.detail.datum[action.payload.data.documentId] = action.payload.data;
+        state.mutation.status = "succeeded";
+      })
+      .addCase(mutatePutArticle.rejected, (state, action) => {
+        state.mutation.error = action.payload as string;
+        state.mutation.status = "failed";
+      })
+
+      // MUTATE DELETE
+      .addCase(mutateDeleteArticle.pending, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "loading";
+      })
+      .addCase(mutateDeleteArticle.fulfilled, (state) => {
+        state.mutation.status = "succeeded";
+      })
+      .addCase(mutateDeleteArticle.rejected, (state, action) => {
         state.mutation.error = action.payload as string;
         state.mutation.status = "failed";
       });

@@ -6,7 +6,7 @@ import { formatISODate } from "@/lib/format-iso-date";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { articleSliceAction } from "@/store/slices/article/articleSlice";
 import { mutatePutComment } from "@/store/slices/comment/commentSlice";
-import { CommentDetail } from "@/store/slices/comment/types";
+import { Comment, CommentDetail } from "@/store/slices/comment/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FilePenLineIcon } from "lucide-react";
 import { useState } from "react";
@@ -15,7 +15,7 @@ import { z } from "zod";
 import DeleteCommentButton from "./delete-comment-button";
 
 type ArticleCommendCardProps = {
-  datum: CommentDetail;
+  datum: CommentDetail | Comment;
   articleDocumentId: string;
 };
 
@@ -62,10 +62,10 @@ export default function ArticleCommentCard({ datum, articleDocumentId }: Article
     <div className="overflow-hidden rounded-lg border border-foreground p-4">
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="font-semibold">{datum.user.username}</span>
+          <span className="font-semibold">{datum.user?.username}</span>
           <span className="text-sm">{formatISODate(datum.publishedAt)}</span>
         </div>
-        {userFromStore && userFromStore.user?.id === datum.user.id && (
+        {userFromStore && userFromStore.user?.id === datum.user?.id && (
           <div className="flex items-center gap-2">
             <Button size="icon" className="h-8 w-8" onClick={() => setIsEditing((prev) => !prev)}>
               <FilePenLineIcon className="h-4 w-4" />
