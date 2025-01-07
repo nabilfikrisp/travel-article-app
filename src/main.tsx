@@ -18,6 +18,7 @@ import { ArticleDetailPage } from "./app/articles/detail/page.tsx";
 import CreateArticlePage from "./app/articles/create/page.tsx";
 import ProfilePage from "./app/profile/page.tsx";
 import ArticleDetailEditPage from "./app/articles/detail/edit/page.tsx";
+import SuperAdminPage from "./app/superadmin/page.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -37,7 +38,7 @@ createRoot(document.getElementById("root")!).render(
               </Route>
 
               <Route element={<AuthGuard />}>
-                <Route path="dashboard" element={<>dashboard</>} />
+                <Route path="superadmin" element={<SuperAdminPage />} />
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
 

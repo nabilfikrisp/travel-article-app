@@ -33,7 +33,7 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
         </DropdownMenuItem>
         <DropdownMenuItem className="hover:cursor-pointer">
           <LayoutDashboardIcon />
-          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/superadmin">Super Admin</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

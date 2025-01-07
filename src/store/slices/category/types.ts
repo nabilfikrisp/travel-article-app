@@ -23,4 +23,8 @@ export type CategoryState = {
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null | undefined;
   };
+  mutation: {
+    status: "idle" | "loading" | "succeeded" | "failed";
+    error: string | null | undefined;
+  };
 };
