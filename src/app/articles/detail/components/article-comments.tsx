@@ -55,7 +55,11 @@ export default function ArticleComments({
     <>
       <ul className="mb-5 flex flex-col gap-4">
         {articleComments.data.map((comment) => (
-          <ArticleCommentCard datum={comment} key={comment.id} />
+          <ArticleCommentCard
+            datum={comment}
+            key={comment.id}
+            articleDocumentId={articleDocumentId}
+          />
         ))}
       </ul>
       {renderButtonCondition && (
