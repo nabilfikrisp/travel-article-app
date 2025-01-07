@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AuthResponse, AuthState, LoginRequestDTO, RegisterRequestDTO } from "./types";
+import { AuthResponse, AuthState, LoginRequestDTO, RegisterRequestDTO, User } from "./types";
 import apiClient from "@/configs/axios-interceptor";
 import { AxiosError } from "axios";
 import Cookies from "js-cookie";
@@ -30,10 +30,14 @@ function generateInitialState(): AuthState {
 const initialState: AuthState = generateInitialState();
 
 export const mutateLogin = createAsyncThunk(
-  "auht/mutateLogin",
+  "auth/mutateLogin",
   async (dto: LoginRequestDTO, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post<AuthResponse>("/auth/local", dto);
+      const response = await apiClient.post<AuthResponse>("/auth/local", dto, {
+        params: {
+          populate: "*",
+        },
+      });
       return response.data;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -45,10 +49,14 @@ export const mutateLogin = createAsyncThunk(
 );
 
 export const mutateRegister = createAsyncThunk(
-  "auht/mutateRegister",
+  "auth/mutateRegister",
   async (dto: RegisterRequestDTO, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post<AuthResponse>("/auth/local/register", dto);
+      const response = await apiClient.post<AuthResponse>("/auth/local/register", dto, {
+        params: {
+          populate: "*",
+        },
+      });
       return response.data;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -58,6 +66,24 @@ export const mutateRegister = createAsyncThunk(
     }
   }
 );
+
+export const fetchGetMe = createAsyncThunk("auth/fetchGetMe", async (_, { rejectWithValue }) => {
+  try {
+    const response = await apiClient.get<User>("/users/me", {
+      params: {
+        "populate[articles][populate][user]": "*",
+        "populate[articles][populate][comments]": "*",
+        "populate[comments][populate][article]": "*",
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+      return rejectWithValue(error.response?.data?.error?.message || error.message);
+    }
+    return rejectWithValue("An unexpected error occurred");
+  }
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -109,6 +135,20 @@ const authSlice = createSlice({
       .addCase(mutateLogin.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
+      })
+
+      // GET ME
+      .addCase(fetchGetMe.pending, (state) => {
+        state.error = null;
+        state.status = "loading";
+      })
+      .addCase(fetchGetMe.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.status = "succeeded";
+      })
+      .addCase(fetchGetMe.rejected, (state, action) => {
+        state.error = action.payload as string;
+        state.status = "failed";
       });
   },
 });

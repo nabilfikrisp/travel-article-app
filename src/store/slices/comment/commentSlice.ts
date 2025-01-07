@@ -17,6 +17,10 @@ const initialState: CommentState = {
     error: null,
   },
   articleComments: {},
+  mutation: {
+    status: "idle",
+    error: null,
+  },
 };
 
 export const fetchCommentByDocumentId = createAsyncThunk(
@@ -48,30 +52,120 @@ export const fetchDetailedComments = createAsyncThunk(
     }: { arrayOfDocumentIds: string[]; articleDocumentId: string; isLoadMore?: boolean },
     { rejectWithValue }
   ) => {
-    console.log(articleDocumentId, "from action");
     try {
-        const responses = await Promise.all(
-          arrayOfDocumentIds.map(async (documentId) => {
-            const response = await apiClient.get<ApiResponse<CommentDetail>>(
-              `/comments/${documentId}`,
-              {
-                params: {
-                  populate: "*",
-                },
-              }
-            );
+      const responses = await Promise.all(
+        arrayOfDocumentIds.map(async (documentId) => {
+          const response = await apiClient.get<ApiResponse<CommentDetail>>(
+            `/comments/${documentId}`,
+            {
+              params: {
+                populate: "*",
+              },
+            }
+          );
 
-            return response.data;
-          })
-        );
+          return response.data;
+        })
+      );
 
-        return {
-          data: responses.map((response) => response.data),
-          articleDocumentId,
-          isLoadMore,
-        };
+      return {
+        data: responses.map((response) => response.data),
+        articleDocumentId,
+        isLoadMore,
+      };
     } catch (error: unknown) {
       return rejectWithValue(error || "Error fetching comments");
+    }
+  }
+);
+
+export const mutatePostComment = createAsyncThunk(
+  "comments/mutatePostComment",
+  async (
+    {
+      content,
+      article,
+      articleDocumentId,
+    }: { content: string; article: number; articleDocumentId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await apiClient.post<ApiResponse<CommentDetail>>(
+        `/comments`,
+        { data: { content, article } },
+        {
+          params: {
+            populate: "*",
+          },
+        }
+      );
+      return {
+        response: response.data,
+        articleDocumentId,
+      };
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response ? error.response.data.error.message : error.message);
+      }
+      return rejectWithValue("An unexpected error occurred");
+    }
+  }
+);
+
+export const mutatePutComment = createAsyncThunk(
+  "comments/mutatePutComment",
+  async (
+    {
+      content,
+      commentDocumentId,
+      articleDocumentId,
+    }: { content: string; commentDocumentId: string; articleDocumentId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await apiClient.put<ApiResponse<CommentDetail>>(
+        `/comments/${commentDocumentId}`,
+        { data: { content } },
+        {
+          params: {
+            populate: "*",
+          },
+        }
+      );
+      return {
+        response: response.data,
+        articleDocumentId,
+      };
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response ? error.response.data.error.message : error.message);
+      }
+      return rejectWithValue("An unexpected error occurred");
+    }
+  }
+);
+
+export const mutateDeleteComment = createAsyncThunk(
+  "comments/mutateDeleteComment",
+  async (
+    {
+      commentDocumentId,
+      articleDocumentId,
+    }: { commentDocumentId: string; articleDocumentId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      await apiClient.delete(`/comments/${commentDocumentId}`, {
+        params: {
+          populate: "*",
+        },
+      });
+      return articleDocumentId;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response ? error.response.data.error.message : error.message);
+      }
+      return rejectWithValue("An unexpected error occurred");
     }
   }
 );
@@ -106,9 +200,9 @@ const commentSlice = createSlice({
         state.articleComments[articleDocumentId].error = null;
       })
       .addCase(fetchDetailedComments.fulfilled, (state, action) => {
-        const { articleDocumentId, data } = action.payload;
+        const { articleDocumentId, data, isLoadMore } = action.payload;
         state.articleComments[articleDocumentId] = {
-          data,
+          data: isLoadMore ? [...state.articleComments[articleDocumentId].data, ...data] : data,
           status: "succeeded",
           error: null,
         };
@@ -117,6 +211,63 @@ const commentSlice = createSlice({
         const { articleDocumentId } = action.meta.arg;
         state.articleComments[articleDocumentId].status = "failed";
         state.articleComments[articleDocumentId].error = action.payload as string;
+      })
+
+      // MUTATE POST COMMENT
+      .addCase(mutatePostComment.pending, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "loading";
+      })
+      .addCase(mutatePostComment.fulfilled, (state, action) => {
+        const { articleDocumentId } = action.payload;
+        if (state.articleComments[articleDocumentId]) {
+          state.articleComments[articleDocumentId].data.unshift(action.payload.response.data);
+        }
+        state.mutation.status = "succeeded";
+      })
+      .addCase(mutatePostComment.rejected, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "failed";
+      })
+
+      // MUTATE PUT COMMENT
+      .addCase(mutatePutComment.pending, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "loading";
+      })
+      .addCase(mutatePutComment.fulfilled, (state, action) => {
+        const { articleDocumentId } = action.payload;
+        if (state.articleComments[articleDocumentId]) {
+          const index = state.articleComments[articleDocumentId].data.findIndex(
+            (comment) => comment.id === action.payload.response.data.id
+          );
+          state.articleComments[articleDocumentId].data[index] = action.payload.response.data;
+        }
+        state.mutation.status = "succeeded";
+      })
+      .addCase(mutatePutComment.rejected, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "failed";
+      })
+
+      // MUTATE DELETE COMMENT
+      .addCase(mutateDeleteComment.pending, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "loading";
+      })
+      .addCase(mutateDeleteComment.fulfilled, (state, action) => {
+        const articleDocumentId = action.payload;
+        const commentDocumentId = action.meta.arg.commentDocumentId;
+        if (state.articleComments[articleDocumentId]) {
+          state.articleComments[articleDocumentId].data = state.articleComments[
+            articleDocumentId
+          ].data.filter((comment) => comment.documentId !== commentDocumentId);
+        }
+        state.mutation.status = "succeeded";
+      })
+      .addCase(mutateDeleteComment.rejected, (state) => {
+        state.mutation.error = null;
+        state.mutation.status = "failed";
       });
   },
 });

@@ -3,40 +3,44 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchDetailedComments } from "@/store/slices/comment/commentSlice";
 import { useEffect, useState } from "react";
 import ArticleCommentLoading from "./article-comment-loading";
+import ArticleCommentCard from "./article-comment-card";
 
 type ArticleCommentsType = {
-  documentIds: string[];
+  commentDocumentIds: string[];
   articleDocumentId: string;
 };
 
-export default function ArticleComments({ articleDocumentId, documentIds }: ArticleCommentsType) {
+export default function ArticleComments({
+  articleDocumentId,
+  commentDocumentIds,
+}: ArticleCommentsType) {
   const dispatch = useAppDispatch();
   const articleComments = useAppSelector(
     (state) => state.comment.articleComments[articleDocumentId]
   );
   const [offset, setOffset] = useState(0);
-  const limit = 5;
+  const limit = 3;
 
   useEffect(() => {
-    if (offset !== 0 || articleComments) return;
+    if (articleComments) {
+      setOffset(articleComments.data.length);
+      return;
+    }
 
     dispatch(
       fetchDetailedComments({
-        arrayOfDocumentIds: documentIds.slice(0, limit),
+        arrayOfDocumentIds: commentDocumentIds.slice(0, limit),
         articleDocumentId,
-        isLoadMore: true,
       })
     );
-  }, [dispatch, articleDocumentId, documentIds, offset, articleComments]);
+  }, [dispatch, articleDocumentId, commentDocumentIds, articleComments]);
 
   const handleLoadMore = () => {
-    const newOffset = offset + limit;
-    setOffset(newOffset);
-
     dispatch(
       fetchDetailedComments({
-        arrayOfDocumentIds: documentIds.slice(newOffset, newOffset + limit),
+        arrayOfDocumentIds: commentDocumentIds.slice(offset, offset + limit),
         articleDocumentId,
+        isLoadMore: true,
       })
     );
   };
@@ -45,16 +49,29 @@ export default function ArticleComments({ articleDocumentId, documentIds }: Arti
   if (articleComments.status === "loading" && offset === 0) return <ArticleCommentLoading />;
   if (articleComments.status === "failed") return <p>Error: {articleComments.error}</p>;
 
+  const renderButtonCondition = articleComments.data.length !== commentDocumentIds.length;
+
   return (
-    <ul>
-      {articleComments.data.map((comment, index) => (
-        <li key={comment.id}>
-          {index + 1}. {comment.content}
-        </li>
-      ))}
-      {offset + limit < documentIds.length && (
-        <Button onClick={() => handleLoadMore()}>Load More</Button>
+    <>
+      <ul className="mb-5 flex flex-col gap-4">
+        {articleComments.data.map((comment) => (
+          <ArticleCommentCard
+            datum={comment}
+            key={comment.id}
+            articleDocumentId={articleDocumentId}
+          />
+        ))}
+      </ul>
+      {renderButtonCondition && (
+        <Button
+          onClick={() => handleLoadMore()}
+          isLoading={articleComments.status === "loading"}
+          className="w-full"
+          variant="secondary"
+        >
+          Load More
+        </Button>
       )}
-    </ul>
+    </>
   );
 }

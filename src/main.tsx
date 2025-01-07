@@ -15,6 +15,10 @@ import AuthGuard from "./app/route-guards/auth-guard.tsx";
 import GuestGuard from "./app/route-guards/guest-guard.tsx";
 import { ThemeProvider } from "./components/theme-provider.tsx";
 import { ArticleDetailPage } from "./app/articles/detail/page.tsx";
+import CreateArticlePage from "./app/articles/create/page.tsx";
+import ProfilePage from "./app/profile/page.tsx";
+import ArticleDetailEditPage from "./app/articles/detail/edit/page.tsx";
+import SuperAdminPage from "./app/superadmin/page.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -27,12 +31,15 @@ createRoot(document.getElementById("root")!).render(
               <Route path="articles">
                 <Route index element={<ArticlesPage />} />
                 <Route element={<AuthGuard />}>
+                  <Route path="create" element={<CreateArticlePage />} />
                   <Route path=":documentId" element={<ArticleDetailPage />} />
+                  <Route path=":documentId/edit" element={<ArticleDetailEditPage />} />
                 </Route>
               </Route>
 
               <Route element={<AuthGuard />}>
-                <Route path="dashboard" element={<>dashboard</>} />
+                <Route path="superadmin" element={<SuperAdminPage />} />
+                <Route path="profile" element={<ProfilePage />} />
               </Route>
 
               <Route path="auth" element={<GuestGuard />}>

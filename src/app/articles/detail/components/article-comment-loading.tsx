@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function ArticleCommentLoading() {
   return (
     <ul className="mb-5 flex flex-col gap-4">
-      {Array.from({ length: 5 }).map((_, index) => (
+      {Array.from({ length: 3 }).map((_, index) => (
         <div className="overflow-hidden rounded-lg border border-foreground p-4" key={index}>
           <div className="mb-2 flex items-center gap-2">
             <span className="font-semibold">

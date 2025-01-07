@@ -1,19 +1,12 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSearchParams } from "react-router";
 
-export default function ArticleLoading() {
-  const [searchParams] = useSearchParams();
-
-  const initialPageSizeParams = searchParams.get("pageSize")
-    ? Number(searchParams.get("pageSize"))
-    : 6;
-
+export default function MyArticlesLoading() {
   return (
-
-      <div>
-        <ul className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: initialPageSizeParams }).map((_, index) => (
+    <div>
+      <ul className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => {
+          return (
             <Card
               key={index}
               className="group flex h-[450px] flex-col overflow-hidden transition-all duration-300 hover:shadow-lg"
@@ -47,10 +40,9 @@ export default function ArticleLoading() {
                 </div>
               </CardFooter>
             </Card>
-          ))}
-        </ul>
-        <Skeleton className="mx-auto h-10 w-52" />
-      </div>
-
+          );
+        })}
+      </ul>
+    </div>
   );
 }

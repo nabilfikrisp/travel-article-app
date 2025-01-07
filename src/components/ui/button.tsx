@@ -43,14 +43,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button";
     const content = (
       <>
-        <span
-          className={cn("inline-flex items-center", {
-            "mr-1": isLoading,
-          })}
-        >
-          {children}
-        </span>
-        {isLoading && <Loader className="h-4 w-4 animate-spin" />}
+        {children}
+        {isLoading && <Loader className="ml-1 h-4 w-4 animate-spin" />}
       </>
     );
 

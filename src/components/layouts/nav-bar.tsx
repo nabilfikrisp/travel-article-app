@@ -10,7 +10,7 @@ export default function NavBar() {
   const { user } = useAppSelector((state) => state.auth);
   return (
     <nav className="sticky top-0 z-10 flex h-[70px] w-full border-b bg-background shadow-lg">
-      <div className="m-auto flex w-full max-w-7xl items-center gap-4 px-5 font-semibold">
+      <div className="m-auto flex w-full max-w-7xl items-center gap-1 sm:gap-4 px-5 font-semibold">
         <Logo />
         <NavLink
           to="/articles"

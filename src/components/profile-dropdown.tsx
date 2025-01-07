@@ -29,11 +29,11 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <UserIcon />
-          Profile
+          <Link to="/profile">Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem className="hover:cursor-pointer">
           <LayoutDashboardIcon />
-          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/superadmin">Super Admin</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
