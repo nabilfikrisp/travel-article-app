@@ -1,51 +1,43 @@
-# React + TypeScript + Vite
+# How to Run a Vite React TypeScript Project from a GitHub Repository
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This guide provides step-by-step instructions to clone, install, and run a Vite React TypeScript project from a GitHub repository.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Prerequisites
 
-## Expanding the ESLint configuration
+Ensure you have the following installed:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Node.js**: [Download Node.js](https://nodejs.org/) (Recommended: LTS version)
+- **Git**: [Download Git](https://git-scm.com/)
+- **Package Manager**: Use `npm` (comes with Node.js) or `yarn`.
 
-- Configure the top-level `parserOptions` property like this:
+---
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Steps to Run the Project
+
+### 1. Clone the Repository
+
+Open your terminal and run:
+
+```bash
+git clone https://github.com/<username>/<repository-name>.git
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 2. Navigate to the Project Directory
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+cd <repository-name>
 ```
-# travel-article-app
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Install Dependencies
+
+```bash
+npm run dev
+```
